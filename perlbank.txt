@@ -1,0 +1,45 @@
+#!/bin/perl
+
+# bank accounts in perl
+# there's another way of doing oop in perl - involving packages and 
+# something called "bless".  I'm not using that - I'm using perl's 
+# more fundamental capabilities to build oop from scratch, like in scheme
+
+sub newaccount
+{
+   my $balance = $_[0];
+
+   my $inquiry = sub { $balance };
+   my $deposit = sub { $balance = $balance + $_[0]; };
+
+   my $chargefee = sub { $balance -= 3; }; # "private" method
+   my $withdraw = sub 
+		  { 
+              $balance = $balance - $_[0]; 
+              &$chargefee(); 
+          };
+  
+   # return interface function:
+   sub
+   {
+     my $method = $_[0]; # requested method
+     if ($method eq withdraw) { return $withdraw; }
+     if ($method eq deposit)  { return $deposit; }
+     if ($method eq inquiry)  { return &$inquiry(); }
+       else { die "error"; }
+   }
+}
+
+my $myaccount = newaccount(500);  # the & is actually optional here.
+my $youraccount = newaccount(800);
+
+my $balance = 50;
+
+$myaccount->(withdraw)->(30);  # ((myaccount 'withdraw) 30)
+
+&{&$youraccount(deposit)}(70);   # alternate syntax
+
+print "my balance is ", $myaccount->(inquiry), "\n";
+print "your balance is ", $youraccount->(inquiry), "\n";
+
+

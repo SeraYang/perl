@@ -1,0 +1,10 @@
+<html><!-- #BeginTemplate "/Templates/maintemplate.dwt" --><!-- DW6 -->
+<head>
+<meta HTTP-EQUIV="REFRESH" CONTENT="0; url=http://www.hofstra.edu/academics/Colleges/HCLAS/CMPSCI/index.html">
+</head>
+<body>
+<h2> Welcome to Hofstra Computer Science Department! </h2>
+	You will be redirected to the new department Website in 5 seconds.
+If you prefer the old site, please click 
+<a href="index.old.html"> here</a>.
+</body>

@@ -1,0 +1,666 @@
+#!/usr/bin/perl
+
+###########################################################################
+################ Professor Liang's Perl Tutorial In Perl  #################
+###########################################################################
+
+
+
+# This document is meant for relatively advanced computer science students
+# to quickly begin using Perl.  Our purpose is to study the characteristics
+# of the Perl language in comparison with other languages.  The reader is
+# urged to consult what I consider to be the standard reference,
+# "Programming Perl" by Larry Wall, et. al., as well as other online
+# tutorials and references to learn all the capabilities and uses of the 
+# language.  Perl is available from www.perl.org.  It should already be
+# installed on Unix-based systems (Linux and Mac OS).  For windows, 
+# you can install strawberry perl, or download perl with cygwin.
+
+# You should run the code in this tutorial with "perl perltutorial.txt"
+# so you can see what exactly each code fragment is doing.  Before each
+# example I print a number in the form "1: ", "2: ", etc..., so you can
+# correlate the output with the source code.  You should also experiment 
+# by making changes to the code.
+
+
+######## I.     Strings and More Strings
+
+  print "1: ";
+  print "2"*3;
+
+# In any other language, you would think me crazy: how can you multiply a
+# string by an integer?  Surely this is a mistake only a beginner will make.
+# However, in Perl, you will in fact see 6!  How? Because strings are the
+# basic data type in Perl. Most everything is treated as strings, including
+# the unquoted 3.  Perl is best in practice for text processing, such as 
+# with the html source of web pages.  It is actually quite awful for 
+# manipulating binary data (C would be best for that purpose).  Strings 
+# therefore have a special status in Perl.  
+
+
+######## II.    Scalar Variables and Static Scope
+
+# Perhaps one reason for the popularity of Perl is all those dollar signs!
+# Most variables (except for file handles) in Perl require a special symbol
+# in front to designate its type.  The most common symbol is "$".
+# The $ symbol in Perl signifies the presence of a scalar value. Scalar
+# values include numerical values, strings, and perhaps most importantly,
+# pointers (memory addrs).  All variables containing scalar values must be
+# prefixed with $.  This is a characteristic that Perl inherited from Unix
+# scripting languages, though it has transcended that simple role long ago.
+# If you are familiar with Java, scalars correspond to fixed, primitive
+# types (plus strings).
+
+print "\n2: ";
+$x = 2;   # assigns 2 to global scalar variable $x
+{
+    my $x = 3;  # assigns 3 to a scoped, "local" variable 
+    print "\nmy x is $x\n";  # prints local variable 3
+}
+print "...and mine is $x\n"; # prints global variable 2
+
+
+# As the above program segment indicates:
+
+#     1. Variables do not have to be declared as in "int x;"  before being used
+#     2. "my" introduces a lexically scoped variable whose scope is defined 
+#        by the enclosing {}s. It is a bit ironic to call it a "local" variable
+#        because "local" is a keyword used for something else.
+#     3. When a scalar var such as $x is placed inside string ""s, Perl 
+#        will in fact expand its value.  To prevent this from happening, use
+
+      print '3: x is still $x inside single quoted strings!', "\n";
+
+#     4. There's no "main" in Perl.  It's run as a script.
+
+# If you're new to Perl, it's natural to forget the $ before variables.  I
+# still do sometimes.  But they are necessary.
+
+
+
+######## III.      Booleans and if-else
+
+# Like C (and unlike Java), Perl has no special type for booleans.  The 
+# null pointer, 0, "", or even "0" all represent false.  Everything else
+# represents true.  You'll sometimes see Perl code such as 
+
+print "4: ";
+if ($val) { print $val; } else { print "\$var is undefined\n"; }
+
+# $val returns false if it was not defined.
+
+# It is important that, in the if-else statement, {}'s enclose the
+# two cases.  They are not optional.  Why?  Think you know C++/Java?
+# What does the following code print?
+
+  # if (2<1) 
+  #   if (1<2) cout << "me"; 
+  # else cout << "no, me";
+
+# It won't print anything, but you'll have to know that the "else" is by
+# convention associated with the closest (innermost) "if", otherwise you 
+# may get confused.  This is the classic "dangling else" problem.  The 
+# required {}'s of Perl help to eliminate this confusion.
+
+
+
+######## IV.       Arrays and Hash Tables
+
+# In addition to scalar values, the @ symbol is used to prefix arrays, and
+# the % symbol prefixes hash arrays.  Perl arrays are not really arrays in the 
+# sense of C or even Java in that they don't necessarily represent a
+# fixed segment of memory.  In fact, arrays in Perl are more appropriately
+# called linked lists in that they can be expanded and shrunk. They are
+# similar to lists in Python. 
+
+print "5: ";
+my @l = (3,5,7);  # declare an array or list of three integer elements
+@l = (2,@l);      # adds an element in front of l non-destructively
+push(@l,4);       # adds element (4) destructively onto right end of list
+pop(@l);          # deletes rightmost element and returns it.
+print "@l\n";     # you don't have to write a loop to print an array
+
+# Why are these things called arrays and not just lists?  Because Perl
+# gives the user the convenient syntax of accessing list elements using
+# the familiar bracket notation:
+
+$l[2] += 4;  # increments the third element of the array by four.
+
+# NOT FAIR!  If l is an array/list then why did we still put $ in front of it?
+# This is a point of contention in the Perl community, and may change in
+# the future.  The reason for the $ is that, although l is an array, l[2]
+# is an integer, which is a scalar.  That's just the way things are now
+# with Perl.  If the value of l[2] is also an array, we would use @l[2].
+
+# Here's how you use a for loop to print an array backwards
+
+print "6: ";
+for(my $i=$#l; $i>=0; $i--)
+{
+    print $l[$i], " ";
+}
+print "\n";
+
+# The expression $#l is the last valid index of l, or the length of l minus
+# one.  Note that $i is local (by virtue of "my") within the loop.  An 
+# alternative is just to say my $i = @l-1;  Perl will automatically infer
+# from the given context of assigning an array to a scalar that by @l you 
+# really mean the length of the list.
+
+## Hash tables are also very basic data structures in Perl. Here's a table
+# one might use to store those Hofstra student id's:
+
+my %id;  #  declares hash table
+$id{"larry"} = 700123456;
+$id{"mary"} = 700654321;
+# etc ...
+
+print "7: mary's id is ", $id{"mary"}, "\n";
+
+# The % symbol prefixes the hash table, while the {}'s (as opposed to []'s)
+# signify that you're accessing a hash table instead of an ordinary array.
+# The function "keys" returns a list containing all the keys of a hash table:
+
+print "8: here are my keys: ", keys(%id), "\n";
+print "9: they look better separated by a comma: ", join(", ", keys(%id)), "\n";
+
+# The "join" built-in function separates the elements of a list using a
+# given string (in this case ", ").  It's commonly used for formatting
+# output.
+
+
+##### The _ variable
+
+# Perl has a special variable "_" which basically represents "whatever
+# is most relevant in the current context."  For example, inside a 
+# procedure, it represents the list (array) of parameters passed to
+# the procedure.
+
+print "10: ";
+# try this:  
+foreach (keys(%id)) { print $id{$_}, "--"; }
+
+# the foreach loop goes through every element of a list, and inside the
+# body of the loop $_ refers to the current value of the list being examined.
+
+# The above foreach loop can also be written by associating a variable
+# with each element, as in foreach $x (keys(%id)) { print $id{$x}, "--"; }.
+
+
+
+
+######## V.     Subroutines: Lambda Terms by Another Name
+
+
+# Here's the non tail-recursive ("naive") fibonacci function:
+
+sub fib1 
+   { my $n = $_[0];
+     if ($n<2) {1} else {fib1($n-1) + fib1($n-2)}
+   }
+
+# Several things are important to point out.  The parameters of the subroutine
+# "fib1" are contained in the implicit array "_".  Thus $_[0] is the
+# first argument, and $_[1] would be the second, and so on.  Secondly,
+# the "return" keyword is optional in perl: whatever is the last
+# expression evaluated determines the value returned by the function.
+
+# You might be wondering: why did I have to declare a local variable $n?
+# Can't I just use $_[0] throughout?  Well, for this function it doesn't 
+# matter, but Perl passes variables to a function in a different way than
+# what you might expect:
+
+sub swap 
+  { my $temp; 
+    $temp = $_[0];
+    $_[0] = $_[1];
+    $_[1] = $temp    # The semicolon is optional on the last line in {}'s
+  }
+
+$x = 2;   $y = 3;
+swap($x,$y);
+print "\n11: the values of \$x and \$y are now $x and $y: they got swapped!\n";
+
+# I use the swap function to remind people that, conventionally, a function's
+# parameters are local variables within the function.  The swap function
+# wouldn't swap anything in Java, but the Perl program above does!  By 
+# default, Perl passes parameters by REFERENCE.  If you know C++, it's the 
+# same as saying 
+
+#           void swap(int& x, int& y)
+
+# Please understand that this is not the same as void swap(int *x, int *y).
+
+# With Perl, whatever you do to a parameter variable WILL be persistent
+# even after the function exits.  This may be a desirable behavior, such
+# as with the swap function above.  However, in general, the standard
+# call-by-value method is recommended.  By assigning $_[0] to a locally
+# declared variable (via "my $n=$_[0]"), I am making the function
+# behave in the "conventional" way.  That is, as a self-contained
+# programmatic unit. Whatever you do to $n will be local within the function.
+
+# Here's a nice feature of Perl.  I don't have to declare variables one
+# at a time:
+
+my ($x,$y);
+
+# declares two variables $x and $y at once using a list.  
+# Similarly, here's an easier way to swap two values:
+
+($x,$y) = ($y,$x);
+
+# An array/list is also a pair underneath, so:
+
+($car, @cdr) = (2,4,6,8);
+
+# will assign $car to 2 and @cdr to the LIST (4,6,8). This is how we separate
+# the first element of a list with the rest of the elements.
+
+# Here's the tail-recursive (iterative) fibonacci function:
+sub fib2
+{ my ($n,$a,$b) = @_;  # localize all arguments
+  if ($n<2) {$b} else {fib2($n-1,$b,$a+$b)}
+}
+
+print "\n12: the 100th fibonacci number is ", fib2(100,1,1), ".\n";
+
+# The naive fibonacci function will give you the same answer, but
+# you'll have to wait around 20,000 years to see it.
+
+  # print fib1(100);   #uncomment at your own risk
+
+# At the end of this tutorial we will use Perl's powers of abstraction
+# to make the naive fibonacci function almost as fast as the tail-recursive
+# version.
+
+# You might be wondering: what if I only passed one or two arguments to
+# a function like fib2, which expects 3?  The answer is that the result
+# becomes unpredictable.  This is a contrast between strongly typed
+# (Java) languages and weakly typed ones (Perl, Scheme). You can expect
+# less errors to be caught at compile-time with Perl.  That's the price
+# you pay for the dexterity of weakly typed languages.
+
+# Just to be complete, here's "fib3", which uses a while loop (happy now?)
+sub fib3
+{  my $n = shift;  # alternative to my $n = $_[0];
+   my ($a,$b) = (1,1); # initial values for $a and $b
+   while ($n>1) 
+   { ($a,$b) = ($b,$a+$b);  $n--; }
+   $b   # the ; is optional for the last line inside {}'s
+}
+
+# Perl's design philosophy is to give programmers a variety of styles to
+# choose from.  For example, 
+
+print "13: ";
+print "1<2\n" unless (1>2);
+
+# is the same as  if (!(1>2)) {print "1<2\n"}.
+
+# Perl is for experienced programmers.  Beginners should stay away from Perl 
+# as they would end up using it in only uninteresting ways and develop 
+# lots of bad habits.
+
+# Finally, you'll see function application sometimes written as
+# &fib3(100).  & is the symbol that prefixes function variables just
+# as $, @ and % prefixes scalars, arrays and hash tables respectively.
+# You may also see (fib3 100) sometimes, which is application in
+# the lambda calculus/scheme style.
+
+
+######## VI.             Pointers
+
+
+# Pointers (aka references or memory addresses) are an important datatype
+# in Perl.  For Java programmers who are not familiar with the generic
+# use of pointers, this section may seem a bit difficult.  It is possible,
+# however, to avoid trouble with pointers by using them in a uniform way,
+# just as in Java.  The next section, on pointers to functions, will adopt
+# this approach.
+
+my $x = 3;
+my $z = \$x;  # sets $z to point to $x.  "\" works like "&" in C.
+$$z += 1; # to buy back the value from the pointer, you need two dollars :-)
+print "14: the value that $z points to is ", $$z, "\n";
+
+# You can also have pointers to complex structures:
+my $x = \%id;  # points x to the id hash array we used earlier.
+print "15: $x points to ", %$x, "\n";
+
+# Note that $, not %, still prefixes x. The pointer itself is a scalar,
+# that is, a 32/64bit memory address.  To dereference a pointer back to its
+# value, as the above examples indicate, we use another $, %, or @ infront,
+# depending on the type of the item being pointed to.
+
+# To illustrate when pointers are needed, let's first look at a function that
+# does NOT require them.  The following function returns the index of an 
+# element $x inside a list @L, returning -1 if it doesn' exist:
+sub indexof
+{
+    my ($x,@L) = @_;  # returns position of x inside L
+    my $i = 0;
+    while (($i <= $#L) && ($x != $L[$i])) {$i++;}
+    if ($i<=$#L) {$i} else {-1} # return -1 if $x not found in list.
+}
+# indexof(3,(4,3,6,8,7)) will return 1, the index of the "3" inside the list.
+
+# This function did not need pointers because Perl nicely separates the 
+# head (or "car") of the list from the rest ("cdr") of the list in the way 
+# you'd expect.  However, sometimes you may want to pass in something else 
+# AFTER the list, or pass two distinct lists to a function.  The next 
+# function returns the intersection of two lists.  Note the use of pointers, 
+# and deduce for yourself why they're needed.  
+
+sub intersection
+{
+    my ($A,$B) = @_;  # assigns two POINTERS to the args
+    my @I = ();   # intersection list to be constructed, initially null
+    foreach my $x (@$A) # for each element x in A,
+    {
+	foreach my $y (@$B) # check if it's also in B 
+	{
+	    if ($x == $y) { @I=($x,@I) }  # add x to I list (can also use push)
+	} # inner loop
+    } # outer loop
+    @I;    # return the I list that was built.
+}
+
+my @l = (1,3,4,7,2,8);
+my @m = (3,9,6,4,1);
+print "16: the intersection of @l and @m is ", intersection(\@l, \@m), "\n";
+
+# Look at the code carefully to see where pointers are making a difference:
+# For example, @$B retrieves the list from the pointer $B.  Also, 
+# $$B[$i] is required to access the (scalar) values of the list.
+# In order to pass a complex structure to a function, in general you'll
+# have to use pointers.  In the above function, at least the first list
+# had to be passed in as a pointer.  
+
+# Here's another way to have hash tables, using pointers:
+
+$myhash->{"key1"} = "value1";  
+$myhash->{"key2"} = "value2";
+
+# Perl infers from {} and -> that $myhash is a pointer to a hash table.
+# C/C++ programmers should know that "A->B" is really "(*A).B".  That is,
+# it dereferences the pointer A and at the same time retrieves the field
+# B from the dereferenced struct/object.  Perl expands this meaning of "->"
+# to the case of arrays, hash tables (and as you will see in the next 
+# section, even functions).  For arrays you can similarly have
+
+$A->[0] = 1;
+$A->[1] = 2;
+print "17: referenced array: ", @$A, "\n";   # prints contents of array
+
+# Just as in C/C++, one way to avoid confusion with pointers is to use them
+# in a CONSISTENT manner  In fact, this observation led to the uniform
+# treatment of pointers in the Java language.  That is, if you adopt the
+# policy to:
+
+#      1. Never use pointers to scalar values
+#      2. Always use pointers to complex structures
+
+# then you'll be emulating the approach of Java (except for strings).
+
+
+
+######## VII.          Pointers to Functions
+
+
+# Now we finally get to what I consider to be the best part of Perl: 
+# its ability to be used as a fully general, higher-order language that's
+# (nearly) as expressive as Church's lambda calculus.  A function (or
+# "subroutine") in Perl can be used like any other value.  It can be passed
+# to another function, returned by a function, and assigned to a variable.
+# Here's the (naive) fibonacci function expressed as a Perl lambda term 
+# assigned to a variable:
+
+ $fib = sub { my $n=shift;   # same as my $n = $_[0];
+ 	     if ($n<2) {1} else {print "I'm in original fib \n"; $fib->($n-1) + $fib->($n-2)}
+            };
+# sub fib{
+#     my $n=shift;   # same as my $n = $_[0];
+#  	     if ($n<2) {1} 
+#          else { 
+#              print "I'm in original fib \n"; 
+#              $fib->($n-1) + $fib->($n-2)
+#          }
+#      };
+
+# $fib->(10);
+# Note the ";" at the end, since this is just an assignment statement!
+# No name follows "sub" - it's just "lambda" for Perl.  To apply the
+# function pointed to by $fib, we use $fib->(args).  So now you see:
+
+#   $A->[$i]  accesses the array pointed to by $A at index $i
+#   $A->{$i}  accesses the hash array pointed to by $A for key $i
+#   $A->($i)  accesses the function pointed to by $A and applies it to $i
+
+# A characteristic of a well-designed language is generality.  Once you
+# get used to all the $#%@ (not a four-letter word!) you'll begin to 
+# see how the syntactic conventions of Perl make sense.
+
+# Having said that however, I should point out one subtlety:  the
+# definition of $fib wouldn't have worked if I had used my $fib = ...;
+# because the recursive calls to $fib would refer to something not defined
+# yet.  "my" in Perl corresponds to "let" in functional languages 
+# such as Scheme.  However, Scheme contains another construct "letrec" that
+# allows one to bind recursive definitions.  Perl lacks this construct, but
+# fortunately it's not a big deal.  To bind $fib to a local var, simply 
+# declare it first on a separate line:
+
+#    my $fib;
+#    $fib = sub { ... };
+
+# When we assign a function to a local variable inside a function,
+# we effectively get a locally defined function.  The following tail-recursive
+# fibonacci function uses this ability to hide the fact that you need to
+# initially pass two additional values (1's) to the recursive function:
+
+$tfib = sub {
+               my $f; # local recursive function
+	       $f = sub
+	            { my ($n,$a,$b) = @_;
+		      if ($n<2) {$b} else {$f->($n-1,$b,$a+$b)}
+		    };
+	       $f->($_[0], 1, 1);  # call internal function 
+            };
+
+# Now to call $tfib, we can just say $tfib->(10), without having to pass in
+# the two 1's.  
+
+# Defining local functions, in addition to hiding implementation detail,
+# can in fact also give us a form of object-orientation.  However, I will
+# leave that discussion out of this tutorial.  You may consult my 
+# document "Bank Accounts in Perl" to see how this is done.
+
+
+######## VIII.           Higher Order Functions
+
+
+# Being able to pass a function as an argument to another function can
+# be a very useful feature.  In fact, graphical user interface API's 
+# commonly rely on them in defining "callback" functions that handle
+# asynchronous events.  The following function is a classic: it applies
+# a given function to a list of values:
+
+sub mapfun
+{  
+    my ($f,@L) = @_;  # separate car,cdr of @_ into function and list
+    my @M =();        # new list to be built
+    foreach my $x (@L) { push( @M, $f->($x) ); }
+    @M                # return new list
+}
+
+$f = sub { 2**$_[0]; }; # function to return 2 to nth power (** = Math.pow)
+
+@powers = mapfun($f,(1,2,3,4,5,6,7,8,9,10));
+print "18: this is how computer people count: ", join(" ",@powers), "\n";
+
+# It's also possible to inline a function when passing it, without defining
+# it first:
+
+@squares = mapfun(sub{$_[0]*$_[0]}, (1,2,3,4,5));
+print "19: squares: @squares \n";
+
+# A function can also return a function.  The following example composes
+# two functions that are passed in as arguments:
+
+sub compose 
+{
+    my ($f,$g) = @_; # parameters are functions $f and $g
+    sub { $f->($g->(@_)); }  # fog(x) = f(g(x))
+}
+
+# compose returns a function that applies g, then f to its arguments.
+
+$f = sub { $_[0] * $_[0] };  # lambda x. x*x
+$g = sub { $_[0] + 1 };      # lambda x. x+1
+$fog = compose($f,$g);
+print "20: applying a dynamically generated function: ", $fog->(4), "\n";
+
+
+####   Automatic Memory Management.
+
+# note that:
+@l = mapfun($f,@l);  
+
+# will effectively replace @l with a new list, namely the list built
+# by mapfun.  If you're a C/C++ programmer, you may be wondering
+# what happened to the original @l list - doesn't it need to be deallocated?
+# The answer is that like Java, Perl is a modern programming language that
+# does automatic memory management or "garbage collection".  Scheme was one
+# of the languages used to study and develop this important technology.  
+# It's not just a convenience; memory management frees the programmer to 
+# think at a higher level, and makes possible a style of programming 
+# previously considered impractical.  It should be obvious that as 
+# computer hardware becomes more powerful, software systems will become
+# more complex, and these in turn will eventually require more advanced
+# programming languages.  But if you don't believe that computers will
+# become even more powerful in the future, then you won't have to learn
+# any new languages.  "FORTRAN rules!"
+
+
+# To (temporarily) bring an end to this tutorial, I will now write a function
+# that can optimize the performance of a function passed to it.  The
+# idea is to avoid redundant computation by storing the results of function
+# calls in a hash table.  Then, the next time the function is called on the
+# same arguments, the hash table is first checked to see if a result already
+# exists.  It's important to point out that this technique only works for
+# a certain kind of functions: it doesn't work for functions that change
+# some external state, e.g, it won't work for any "void" functions.  But it 
+# works wonderfully on recursive functions such as the naive fibonacci 
+# function, as it would eliminate all redundant recursive calls.  The 
+# function takes a function as an argument and returns an optimized version 
+# of it:
+
+sub makehashfun  
+{
+   my $f = shift;  # function to be optimized
+   my $hash;       # local hash table to store results,pointer.
+   sub {           # new version of function
+    my @args = @_;
+    my $jargs = join ",",@args;  # join multiple args into hash key
+    # print "\$jargs is ",$jargs;
+    my $val = $hash->{$jargs};   # look up hash table
+    # print "   \$value is ", $val," \n";
+    if ($val) {$val;}            # if value exists, we're done!
+    else {                       # need to call function
+        # print "I'm BEFORE \n";
+       $val = $f->(@args);      # calls function
+       # print "I'm AFTER \n";
+       $hash->{$jargs} = $val;  # store result in hash table
+       $val;                    # return value
+    }  # else
+   }  # returned subroutine of makehashfun
+}  # makehashfun
+########## Because of the pointer to the function. Once there is a 
+########## change to the pointer of the function $fib, anywhere call
+########## the function using this pointer, will resulting pointing
+########## to the new function.
+
+
+
+# $fibx = makehashfun($fib);  # optimizes naive fibonacci function (see Sec. VII)----The name must be the same. Otherwise, repeatly call the function will not make the new optimized functions come effect.
+$fib = makehashfun($fib);  # optimizes naive fibonacci function (see Sec. VII)
+########### After the assignment above, the $fib anywhere will point to
+########### the makehashfun subroutine. Even in the original function 
+########### $fib pointed to.
+########### Additionally, the original subroutine was transferred to the
+########### pointer---$f in the body of makehashfun().
+########### As a result, there are something in either's body pointing to
+########### each other.
+
+
+# comment out the above line at your own risk!
+
+print "21: Now you won't have to wait 20,000 years to see ", $fib->(10), "\n";
+
+# The function returned by makehashfun is called a "closure".  In addition
+# to being a lambda term, it also carries with it an "environment", namely
+# its hashtable.  The hash table is "stateful" - that is, it retains its
+# values between separate calls to the function.  In this sense, the
+# returned subroutine behaves more like a "method" in an oop language than
+# a pure "function".  This topic, however, is out of the scope of this
+# "kick start" tutorial.
+
+# Having seen higher-order functions, you are now ready to read my 
+# document "Lambda Calculus in Perl" for the greatest spiritual journey 
+# in computer science.
+
+
+#########################################################################
+
+# There's a lot more to talk about in Perl.  As my purpose here is to 
+# introduce the essential characteristics of the programming language,
+# I've not touched on some features that make Perl so popular in
+# practice, such as its I/O model and its facility with regular
+# expressions and parsing.  I've also not touched on the recently-added
+# support for a rudimentary form of object-orientation (Perl packages).
+# A large number of ready-made Perl modules are available from www.cpan.org.
+# You may find these topics in other Perl references, or stay tuned for
+# a future, expanded edition of this tutorial.
+
+# In addition, I also have a number of programs that further illustrate 
+# the uses and characteristics of Perl.  You should consult the following
+# files on my programming languages class homepage:
+
+# lambdaperl2.txt : Lambda Calculus in Perl
+# dynamic.pl: Explains the use of "local" in contrast to "my".
+# perlbank.txt: Uses closures, alluded to above, for a style of OOP
+# blessed.txt : Uses the new Perl Package-based OOP 
+# webclient.pl : TCP client to download html pages from a web server
+# byteordering.pl : Binary data manipulation in Perl (not for the weak)
+# submitprog2.txt : CGI form for uploading files to a web server
+
+print "\nDo your own research to learn more ...\n";
+
+
+######################## OUTPUT OF THIS PROGRAM ##########################
+
+# 1: 6
+# 2: 
+# my x is 3
+# ...and mine is 2
+# 3: x is still $x inside single quoted strings!
+# 4: $var is undefined
+# 5: 2 3 5 7
+# 6: 7 9 3 2 
+# 7: mary's id is 700654321
+# 8: here are my keys: marylarry
+# 9: they look better separated by a comma: mary, larry
+# 10: 700654321--700123456--
+# 11: the values of $x and $y are now 3 and 2: they got swapped!
+#
+# 12: the 100th fibonacci number is 5.73147844013817e+20.
+# 13: 1<2
+# 14: the value that SCALAR(0x38eac) points to is 4
+# 15: HASH(0x32958) points to mary700654321larry700123456
+# 16: the intersection of 1 3 4 7 2 8 and 3 9 6 4 1 is 431
+# 17: referenced array: 12
+# 18: this is how computer people count: 2 4 8 16 32 64 128 256 512 1024
+# 19: squares: 1 4 9 16 25 
+# 20: applying a dynamically generated function: 25
+# 21: Now you won't have to wait 20,000 years to see 5.73147844013817e+20
+# 
+# Do your own research to learn more ...
