@@ -1,0 +1,3 @@
+This is a file for test branch merging.
+
+If any commits have been made to the upstream master branch, you should rebase your development branch so that merging it will be a simple fast-forward that won't require any conflict resolution work.
